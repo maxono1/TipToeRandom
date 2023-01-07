@@ -28,26 +28,26 @@ public class TipToeLogic : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        paths = new bool[depth, width];
+        paths = new bool[width, depth];
 
         platformPrefab.transform.localScale = new Vector3(2.9f, 0.2f, 2.9f);
-        for (int i = 0; i < depth; i++)
+        for (int i = 0; i < width; i++)
         {
             Debug.Log(i);   
             if (i <= 5)
             {
-                paths[i, 3] = true;
+                paths[3, i] = true;
             } 
             if(i >= 5)
             {
-                paths[i, 4] = true;
+                paths[4, i] = true;
             }
             
         }
 
-        for (int i = 0; i < depth; i++)
+        for (int i = 0; i < width; i++)
         {
-            for (int j = 0; j < width; j++)
+            for (int j = 0; j < depth; j++)
             {
                 //Debug.Log("wtf");
                 GameObject gameObject = Instantiate(platformPrefab, new Vector3(-13.52f + (gap * j), 0, 10 + (gap * i)), Quaternion.identity);
@@ -65,12 +65,22 @@ public class TipToeLogic : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
     }
     //current koordinate
     //x ist width, y depth
     //startpunkt random 0-(width-1), 1
 
+    void startAlgo()
+    {
+        bool[,] bools = new bool[width, depth];
+        int x = Random.Range(0, width);
+        bools[x, 0] = true;
+        bools[x, 1] = true;
+
+        PlatformPos currentPos = new PlatformPos(x, 1);
+        loop(bools, currentPos);
+    }
 
     //
     // N: x, y+1
