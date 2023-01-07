@@ -16,6 +16,7 @@ public class TipToeLogic : MonoBehaviour
     }
 
     [SerializeField] private GameObject platformPrefab;
+    [SerializeField] private Material pathMat;
     //[SerializeField] private Shader platformShader;
     private readonly int width = 10;
     private readonly int depth = 13;
@@ -23,7 +24,7 @@ public class TipToeLogic : MonoBehaviour
 
     private bool[,] paths;
 
-    
+
 
     // Start is called before the first frame update
     void Start()
@@ -31,32 +32,33 @@ public class TipToeLogic : MonoBehaviour
         paths = new bool[width, depth];
 
         platformPrefab.transform.localScale = new Vector3(2.9f, 0.2f, 2.9f);
-        for (int i = 0; i < width; i++)
+        for (int i = 0; i < depth; i++)
         {
-            Debug.Log(i);   
+            Debug.Log(i);
             if (i <= 5)
-            {
-                paths[3, i] = true;
-            } 
-            if(i >= 5)
             {
                 paths[4, i] = true;
             }
-            
-        }
+            if (i >= 5)
+            {
+                paths[5, i] = true;
+            }
 
+        }
+        startAlgo();
         for (int i = 0; i < width; i++)
         {
             for (int j = 0; j < depth; j++)
             {
                 //Debug.Log("wtf");
-                GameObject gameObject = Instantiate(platformPrefab, new Vector3(-13.52f + (gap * j), 0, 10 + (gap * i)), Quaternion.identity);
+                GameObject gameObject = Instantiate(platformPrefab, new Vector3(-13.52f + (gap * i), 0, 10 + (gap * j)), Quaternion.identity);
                 // https://docs.unity3d.com/ScriptReference/GameObject.AddComponent.html
                 //gameObject.AddComponent(typeof(BoxCollider));
                 //gameObject.AddComponent(typeof(TipToePlatform));
                 if (paths[i, j])
                 {
                     gameObject.GetComponent<TipToePlatform>().isPath = true;
+                    gameObject.GetComponent<TipToePlatform>().defaultMaterial = pathMat;
                 }
             }
         }
@@ -67,10 +69,11 @@ public class TipToeLogic : MonoBehaviour
     {
 
     }
-    //current koordinate
+
+    
     //x ist width, y depth
     //startpunkt random 0-(width-1), 1
-
+    //diese methode setzt die ersten beiden felder random, aber zusammen
     void startAlgo()
     {
         bool[,] bools = new bool[width, depth];
@@ -79,7 +82,8 @@ public class TipToeLogic : MonoBehaviour
         bools[x, 1] = true;
 
         PlatformPos currentPos = new PlatformPos(x, 1);
-        loop(bools, currentPos);
+        this.paths = bools;
+        backtracking(bools, currentPos);
     }
 
     //
@@ -108,9 +112,10 @@ public class TipToeLogic : MonoBehaviour
         if (p.x >= 0 && p.x < width && p.y > 0 && p.y < depth)
         {
             return true;
-        } else
+        }
+        else
         {
-            return false; 
+            return false;
         }
     }
 
@@ -121,31 +126,30 @@ public class TipToeLogic : MonoBehaviour
     //--> inside bounds
     //
     //ist noch nicht true im bool array(noch kein pfad gesetzt)
+    //
     //neue platform hat nur 1 nachbar, da wo es herkommt
     List<PlatformPos> findLegalMovements(PlatformPos currentPos)
     {
         List<PlatformPos> legalMovements = new();
         List<PlatformPos> psblMovements = give_NWOS_OfPlatformPos(currentPos);
-        
+
         foreach (PlatformPos p in psblMovements)
         {
             int numberOfNeighbors = 0;
-            bool notOccupied = false;
             
+
             List<PlatformPos> psblNeighbors = give_NWOS_OfPlatformPos(p);
-            foreach(PlatformPos n in psblNeighbors){
+            foreach (PlatformPos n in psblNeighbors)
+            {
                 //wenn ein gültiger nachbar ist, und schon ein pfad drauf ist, ist es ein richtiger nachbar
                 if (isInsideBounds(n) && paths[n.x, n.y])
                 {
                     numberOfNeighbors++;
                 }
             }
-            if(!paths[p.x, p.y])
-            {
-                notOccupied = true;
-            }
+            
 
-            if(isInsideBounds(p) && numberOfNeighbors == 1 && notOccupied)
+            if (isInsideBounds(p) && numberOfNeighbors == 1 && !paths[p.x, p.y])
             {
                 legalMovements.Add(p);
             }
@@ -154,23 +158,34 @@ public class TipToeLogic : MonoBehaviour
         return legalMovements;
     }
 
-    bool backtracking(PlatformPos currentPlatformPos)
+    bool backtracking(bool[,] bools,PlatformPos currentPlatformPos)
     {
         //wo kann man sich legal hinbewegen?
         List<PlatformPos> legalMovements = findLegalMovements(currentPlatformPos);
-        int movementOfChoice = Random.Range(0, legalMovements.Count);
-        //wir brauchen eine liste von haram movements
-        //diese movements in einem array speichern
-
-
-
-        //wähle einen neuen teillösungsschritt -- hier random
-        bool gueltig = true;
-        if (gueltig)
+        while(legalMovements.Count > 0)
         {
-            //wenn vollständig, dann return true
+            int movementOfChoiceIndex = Random.Range(0, legalMovements.Count);
+            PlatformPos movementOfChoice = legalMovements[movementOfChoiceIndex];
+            legalMovements.RemoveAt(movementOfChoiceIndex);
+
+            bools[movementOfChoice.x, movementOfChoice.y] = true;
+            if(movementOfChoice.y == depth - 1)
+            {
+                paths = bools;
+                return true;
+            }
+            if (backtracking(bools, movementOfChoice))
+            {
+                return true;
+            } else
+            {
+                //bools[movementOfChoice.x, movementOfChoice.y] = false;
+                //das wird rausgenommen, damit automatisch sackgassen entstehen
+            }
+            //psbl error, was wenn die anderen nicht nachrücken?
         }
 
+        //wenn keine legalMovements vorhanden, return false
         return false;
     }
 }
