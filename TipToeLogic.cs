@@ -63,26 +63,27 @@ public class TipToeLogic : MonoBehaviour
                 {
                     if (j == 0 || (j > 0 && paths[i, j - 1]))
                     {
-                        gameObject.AddComponent(typeof(NavMeshLink));
-                        gameObject.GetComponent<NavMeshLink>().endPoint = new Vector3(0, 0, 0);
+                        NavMeshLink backLink = gameObject.AddComponent(typeof(NavMeshLink)) as NavMeshLink;
+                        backLink.endPoint = new Vector3(0, 0, 0);
                     }
                     if (i < width - 1 && paths[i + 1, j])
                     {
-                        gameObject.AddComponent(typeof(NavMeshLink));
-                        gameObject.GetComponent<NavMeshLink>().endPoint = new Vector3(0, 0, 0);
-                        gameObject.GetComponent<NavMeshLink>().startPoint = new Vector3(2, 0, 0);
+                        NavMeshLink rightLink = gameObject.AddComponent(typeof(NavMeshLink)) as NavMeshLink;
+
+                        rightLink.endPoint = new Vector3(0, 0, 0);
+                        rightLink.startPoint = new Vector3(2, 0, 0);
                     }
                     if (i > 0 && paths[i - 1, j])
                     {
-                        gameObject.AddComponent(typeof(NavMeshLink));
-                        gameObject.GetComponent<NavMeshLink>().endPoint = new Vector3(0, 0, 0);
-                        gameObject.GetComponent<NavMeshLink>().startPoint = new Vector3(-2, 0, 0);
+                        NavMeshLink leftLink = gameObject.AddComponent(typeof(NavMeshLink)) as NavMeshLink;
+                        leftLink.endPoint = new Vector3(0, 0, 0);
+                        leftLink.startPoint = new Vector3(-2, 0, 0);
                     }
                     if (j == depth - 1 || (j < depth - 1 && paths[i, j + 1]))
                     {
-                        gameObject.AddComponent(typeof(NavMeshLink));
-                        gameObject.GetComponent<NavMeshLink>().endPoint = new Vector3(0, 0, 2);
-                        gameObject.GetComponent<NavMeshLink>().startPoint = new Vector3(0, 0, 0);
+                        NavMeshLink topLink = gameObject.AddComponent(typeof(NavMeshLink)) as NavMeshLink;
+                        topLink.endPoint = new Vector3(0, 0, 2);
+                        topLink.startPoint = new Vector3(0, 0, 0);
                     }
                     gameObject.layer = 8;
                     gameObject.AddComponent(typeof(NavMeshSurface));
