@@ -109,7 +109,7 @@ public class TipToeLogic : MonoBehaviour
     void startAlgo()
     {
         bool[,] bools = new bool[width, depth];
-        int x = Random.Range(0, width);
+        int x = Random.Range(0, width-3);
         bools[x, 0] = true;
         bools[x, 1] = true;
 
