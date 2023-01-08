@@ -179,9 +179,14 @@ public class TipToeLogic : MonoBehaviour
                 return true;
             } else
             {
-                //bools[movementOfChoice.x, movementOfChoice.y] = false;
                 //das wird rausgenommen, damit automatisch sackgassen entstehen
+                //bools[movementOfChoice.x, movementOfChoice.y] = false;
+                
+                
+                //wir müssen nochmal die Legal movements suchen, weil nach backtracking sich das feld verändert hat
+                legalMovements = findLegalMovements(currentPlatformPos);
             }
+
             //psbl error, was wenn die anderen nicht nachrücken?
         }
 
