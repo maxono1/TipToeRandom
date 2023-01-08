@@ -189,13 +189,10 @@ public class TipToeLogic : MonoBehaviour
             else
             {
                 //das wird rausgenommen, damit automatisch sackgassen entstehen
-<<<<<<< Updated upstream
                 //bools[movementOfChoice.x, movementOfChoice.y] = false;
                 
                 
                 //wir müssen nochmal die Legal movements suchen, weil nach backtracking sich das feld verändert hat
-=======
->>>>>>> Stashed changes
                 legalMovements = findLegalMovements(currentPlatformPos);
             }
 
