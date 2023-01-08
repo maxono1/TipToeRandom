@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Unity.AI.Navigation;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class TipToeLogic : MonoBehaviour
 {
@@ -14,6 +16,8 @@ public class TipToeLogic : MonoBehaviour
             this.y = y;
         }
     }
+
+
 
     [SerializeField] private GameObject platformPrefab;
     [SerializeField] private Material pathMat;
@@ -54,11 +58,15 @@ public class TipToeLogic : MonoBehaviour
                 GameObject gameObject = Instantiate(platformPrefab, new Vector3(-13.52f + (gap * i), 0, 10 + (gap * j)), Quaternion.identity);
                 // https://docs.unity3d.com/ScriptReference/GameObject.AddComponent.html
                 //gameObject.AddComponent(typeof(BoxCollider));
-                //gameObject.AddComponent(typeof(TipToePlatform));
+
                 if (paths[i, j])
                 {
+                    gameObject.layer = 8;
+                    gameObject.AddComponent(typeof(NavMeshSurface));
                     gameObject.GetComponent<TipToePlatform>().isPath = true;
                     gameObject.GetComponent<TipToePlatform>().defaultMaterial = pathMat;
+                    gameObject.GetComponent<NavMeshSurface>().layerMask = LayerMask.GetMask("Nav");
+                    gameObject.GetComponent<NavMeshSurface>().BuildNavMesh();
                 }
             }
         }
@@ -70,7 +78,7 @@ public class TipToeLogic : MonoBehaviour
 
     }
 
-    
+
     //x ist width, y depth
     //startpunkt random 0-(width-1), 1
     //diese methode setzt die ersten beiden felder random, aber zusammen
@@ -136,7 +144,7 @@ public class TipToeLogic : MonoBehaviour
         foreach (PlatformPos p in psblMovements)
         {
             int numberOfNeighbors = 0;
-            
+
 
             List<PlatformPos> psblNeighbors = give_NWOS_OfPlatformPos(p);
             foreach (PlatformPos n in psblNeighbors)
@@ -147,7 +155,7 @@ public class TipToeLogic : MonoBehaviour
                     numberOfNeighbors++;
                 }
             }
-            
+
 
             if (isInsideBounds(p) && numberOfNeighbors == 1 && !paths[p.x, p.y])
             {
@@ -158,18 +166,18 @@ public class TipToeLogic : MonoBehaviour
         return legalMovements;
     }
 
-    bool backtracking(bool[,] bools,PlatformPos currentPlatformPos)
+    bool backtracking(bool[,] bools, PlatformPos currentPlatformPos)
     {
         //wo kann man sich legal hinbewegen?
         List<PlatformPos> legalMovements = findLegalMovements(currentPlatformPos);
-        while(legalMovements.Count > 0)
+        while (legalMovements.Count > 0)
         {
             int movementOfChoiceIndex = Random.Range(0, legalMovements.Count);
             PlatformPos movementOfChoice = legalMovements[movementOfChoiceIndex];
             legalMovements.RemoveAt(movementOfChoiceIndex);
 
             bools[movementOfChoice.x, movementOfChoice.y] = true;
-            if(movementOfChoice.y == depth - 1)
+            if (movementOfChoice.y == depth - 1)
             {
                 paths = bools;
                 return true;
@@ -177,13 +185,17 @@ public class TipToeLogic : MonoBehaviour
             if (backtracking(bools, movementOfChoice))
             {
                 return true;
-            } else
+            }
+            else
             {
                 //das wird rausgenommen, damit automatisch sackgassen entstehen
+<<<<<<< Updated upstream
                 //bools[movementOfChoice.x, movementOfChoice.y] = false;
                 
                 
                 //wir müssen nochmal die Legal movements suchen, weil nach backtracking sich das feld verändert hat
+=======
+>>>>>>> Stashed changes
                 legalMovements = findLegalMovements(currentPlatformPos);
             }
 
