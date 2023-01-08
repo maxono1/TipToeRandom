@@ -61,6 +61,29 @@ public class TipToeLogic : MonoBehaviour
 
                 if (paths[i, j])
                 {
+                    if (j == 0 || (j > 0 && paths[i, j - 1]))
+                    {
+                        gameObject.AddComponent(typeof(NavMeshLink));
+                        gameObject.GetComponent<NavMeshLink>().endPoint = new Vector3(0, 0, 0);
+                    }
+                    if (i < width - 1 && paths[i + 1, j])
+                    {
+                        gameObject.AddComponent(typeof(NavMeshLink));
+                        gameObject.GetComponent<NavMeshLink>().endPoint = new Vector3(0, 0, 0);
+                        gameObject.GetComponent<NavMeshLink>().startPoint = new Vector3(2, 0, 0);
+                    }
+                    if (i > 0 && paths[i - 1, j])
+                    {
+                        gameObject.AddComponent(typeof(NavMeshLink));
+                        gameObject.GetComponent<NavMeshLink>().endPoint = new Vector3(0, 0, 0);
+                        gameObject.GetComponent<NavMeshLink>().startPoint = new Vector3(-2, 0, 0);
+                    }
+                    if (j == depth - 1 || (j < depth - 1 && paths[i, j + 1]))
+                    {
+                        gameObject.AddComponent(typeof(NavMeshLink));
+                        gameObject.GetComponent<NavMeshLink>().endPoint = new Vector3(0, 0, 2);
+                        gameObject.GetComponent<NavMeshLink>().startPoint = new Vector3(0, 0, 0);
+                    }
                     gameObject.layer = 8;
                     gameObject.AddComponent(typeof(NavMeshSurface));
                     gameObject.GetComponent<TipToePlatform>().isPath = true;
@@ -190,8 +213,8 @@ public class TipToeLogic : MonoBehaviour
             {
                 //das wird rausgenommen, damit automatisch sackgassen entstehen
                 //bools[movementOfChoice.x, movementOfChoice.y] = false;
-                
-                
+
+
                 //wir müssen nochmal die Legal movements suchen, weil nach backtracking sich das feld verändert hat
                 legalMovements = findLegalMovements(currentPlatformPos);
             }
